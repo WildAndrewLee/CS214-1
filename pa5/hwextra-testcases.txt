@@ -1,0 +1,165 @@
+Malloc Assignment Tests
+By Sakib Jalal and Andrew Lee
+
+
+Case 1: Tests basic malloc and free
+-----------------------------------------------------------
+Input:
+    void *p1 = malloc(100);
+    void *p2 = malloc(75);
+    void *p3 = malloc(50);
+    void *p4 = malloc(125);
+    free(p1);
+    free(p2);
+    free(p3);
+    free(p4);
+    return 0;
+
+Expected Output:
+    Leaked Memory Summary:
+        No leaked memory! :)
+
+
+Case 2: Tries to Malloc something bigger than entire memory block
+-----------------------------------------------------------
+Input:
+    void *p1 = malloc(10000); // max block size is 5000
+    return 0;
+
+Expected Output:
+    Error: No room in any block to allocate this chunk.
+        Error made on line 5 in test2.c
+    Leaked Memory Summary:
+        No leaked memory! :)
+
+Case 3: multiple mallocs where the last malloc doesn't have enough room
+-----------------------------------------------------------
+Input:
+    void *p1 = malloc(2500);
+    void *p2 = malloc(2500);
+    void *p3 = malloc(2500);
+    void *p4 = malloc(2500);
+    free(p1);
+    free(p2);
+    free(p3);
+    return 0;
+
+Expected Output:
+    Error: No room in any block to allocate this chunk.
+        Error made on line 8 in test3.c
+    Leaked Memory Summary:
+        No leaked memory! :)
+
+
+Case 4: malloc a negative amount or 0
+-----------------------------------------------------------
+Input:
+    void* p1 = malloc(0);
+    void* p2 = malloc(-1200);
+    return 0;
+
+Expected Output:
+    Error: Cannot allocate non-positive space!
+        The error was made on was made on line 5 in test4.c
+    Error: Cannot allocate non-positive space!
+        The error was made on was made on line 6 in test4.c
+    Leaked Memory Summary:
+        No leaked memory! :)
+
+
+Case 5: free something that hasn't been malloc'd
+-----------------------------------------------------------
+Input:
+    int a = 9;
+    int* b = &a;
+    free(b);
+    return 0;
+
+Expected Output:
+    ERROR: Invalid free! Pointer was not malloc'd.
+        Error made on line 6 in test5.c
+
+//  (no leaked memory summary displayed because nothing is malloc'd in the first place)
+
+
+Case 6: free something that has been already freed
+-----------------------------------------------------------
+Input:
+    string s = (string) malloc(200);
+    strcpy(s, "blah blah");
+    free(s);
+    free(s);
+    return 0;
+
+Expected Output:
+    Error: Invalid free! Pointer is already freed.
+        Error made on line 7 in test6.c
+    Leaked Memory Summary:
+        No leaked memory! :)
+
+
+Case 7: freeing a pointer which is an offset of an actual allocated memory chunk
+-----------------------------------------------------------
+Input:
+    string s = (string) malloc(200);
+    strcpy(s, "blah blah");
+    free(s+20);
+    free(s);
+    return 0;
+
+Expected Output:
+    Error: Invalid free! Corrupt data.
+        Error made on line 6 in test7.c
+    Leaked Memory Summary:
+        No leaked memory! :)
+
+
+Case 8: checks actual memory leaks (all tests do this by default)
+-----------------------------------------------------------
+Input:
+    void* p1 = malloc(1400);
+    void* p2 = malloc(1400);
+    void* p3 = malloc(1400);
+    void* p4 = malloc(1400);
+    return 0;
+
+Expected Output:
+    Leaked Memory Summary:
+        Leaked memory allocation!
+            Line 4 in test8.c
+        Leaked memory allocation!
+            Line 5 in test8.c
+        Leaked memory allocation!
+            Line 6 in test8.c
+        Leaked memory allocation!
+            Line 7 in test8.c
+
+
+Case 9: calloc
+-----------------------------------------------------------
+Input:
+    string a = (string) calloc(2, 200);
+    a[1] = 'h';
+    free(a);
+    return 0;
+
+Expected Output:
+    Leaked Memory Summary:
+        No leaked memory! :)
+
+
+Case 10: Data Corruption Check
+-----------------------------------------------------------
+Input:
+    string a = (string) malloc(100);
+    strcpy(a-sizeof(struct MemEntry)+1,"BLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAH");
+    string b = (string) malloc(10);
+    return 0;
+
+Expected Output:
+    The data is corrupt. Malloc() can't allocate space.
+        Exiting malloc()
+    Leaked Memory Summary:
+        The data is corrupt.
+            Cannot check for leaked memory.
+

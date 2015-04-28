@@ -1,0 +1,9 @@
+#include "malloc.h"
+
+int main(int argc, char const* argv[])
+{
+    string a = (string) malloc(100);
+    strcpy(a-sizeof(struct MemEntry)+1,"BLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAHBLAH");
+    string b = (string) malloc(10);
+    return 0;
+}
