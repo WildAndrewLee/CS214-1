@@ -52,7 +52,7 @@ EXTRA CREDIT
        the chunk of memory we are given by malloc with memset() and subsequently
        returning the pointer back to the user, with NULL checks in the middle.
 
-    4. Corruption Detection (10 points): We check for corruption by checking if the
+    3. Corruption Detection (10 points): We check for corruption by checking if the
        pattern field for each memory chunk in our memory space is
        valid for a predetermined value, which we chose to be BLOCK_SIZE + 69.
        If it is not valid, we assume that the memory chunk has been written over
