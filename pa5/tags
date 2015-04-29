@@ -1,0 +1,45 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BLOCK_SIZE	malloc.c	3;"	d	file:
+GREEN	malloc.h	13;"	d
+MEM_SIZE	malloc.h	16;"	d
+MemEntry	malloc.h	/^struct MemEntry {$/;"	s
+MemEntry	malloc.h	/^typedef struct MemEntry* MemEntry;$/;"	t	typeref:struct:MemEntry
+RED	malloc.h	12;"	d
+RESET	malloc.h	14;"	d
+block	malloc.c	/^static char block[BLOCK_SIZE];$/;"	v	file:
+calloc	malloc.h	9;"	d
+file	malloc.h	/^    string file;$/;"	m	struct:MemEntry
+free	malloc.h	10;"	d
+is_corrupt	malloc.c	/^int is_corrupt() {$/;"	f
+is_free	malloc.h	/^    size_t is_free, size, line_num, pattern;$/;"	m	struct:MemEntry
+leak_check	malloc.c	/^void leak_check() {$/;"	f
+line_num	malloc.h	/^    size_t is_free, size, line_num, pattern;$/;"	m	struct:MemEntry
+main	test1.c	/^int main (int argc, char **argv){$/;"	f
+main	test10.c	/^int main(int argc, char const* argv[])$/;"	f
+main	test2.c	/^int main (int argc, char **argv){$/;"	f
+main	test3.c	/^int main (int argc, char **argv){$/;"	f
+main	test4.c	/^int main (int argc, char **argv){$/;"	f
+main	test5.c	/^int main (int argc, char **argv){$/;"	f
+main	test6.c	/^int main (int argc, char **argv){$/;"	f
+main	test7.c	/^int main (int argc, char **argv){$/;"	f
+main	test8.c	/^int main (int argc, char **argv){$/;"	f
+main	test9.c	/^int main (int argc, char **argv){$/;"	f
+main	testing.c	/^int main(){$/;"	f
+malloc	malloc.h	8;"	d
+my_calloc	malloc.c	/^void* my_calloc(size_t size, string file, size_t line) {$/;"	f
+my_free	malloc.c	/^void my_free(void* p, string file, size_t line) {$/;"	f
+my_malloc	malloc.c	/^void* my_malloc(size_t size, string file, size_t line) {$/;"	f
+next	malloc.h	/^    struct MemEntry *prev, *next;$/;"	m	struct:MemEntry	typeref:struct:MemEntry::
+next	testing.c	/^	struct node* next;$/;"	m	struct:node	typeref:struct:node::node	file:
+node	testing.c	/^struct node {$/;"	s	file:
+node	testing.c	/^typedef struct node* node;$/;"	t	typeref:struct:node	file:
+pattern	malloc.h	/^    size_t is_free, size, line_num, pattern;$/;"	m	struct:MemEntry
+prev	malloc.h	/^    struct MemEntry *prev, *next;$/;"	m	struct:MemEntry	typeref:struct:MemEntry::MemEntry
+size	malloc.h	/^    size_t is_free, size, line_num, pattern;$/;"	m	struct:MemEntry
+string	malloc.h	/^typedef char* string;$/;"	t
+value	testing.c	/^	int value;$/;"	m	struct:node	file:

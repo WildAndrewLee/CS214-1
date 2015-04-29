@@ -13,16 +13,20 @@ void* my_malloc(size_t size, string file, size_t line) {
 
     // If block is uninitialized
     if (!initialized) {
-        root = (MemEntry) block;
+        //Initialize block to be NULL.
+		memset(block, 0, BLOCK_SIZE);
+		
+		root = (MemEntry) block;
         root->prev = root->next = 0;
-        root->size = BLOCK_SIZE - MEM_SIZE;
+        root->size = BLOCK_SIZE - sizeof(struct MemEntry);
         root->is_free = 1;
         root->pattern = BLOCK_SIZE + 69;
         root->file = file;
         root->line_num = line;
         atexit(leak_check);
         initialized = 1;
-    }
+ //   	printf("sizeof(struct MemEntry): %d\n", sizeof(MemEntry));
+	}
 
     // Error checks
     if (is_corrupt() == 1) {
@@ -58,28 +62,37 @@ void* my_malloc(size_t size, string file, size_t line) {
 
     p = smallest;
 
-    if (p->size < (size + MEM_SIZE)) {
+    if (p->size < (size + sizeof(struct MemEntry))) {
         // Cannot break the current smallest chunk into two chunks
         p->is_free = 0;
         p->line_num = line;
         p->file = file;
-        return p+1;
+		//printf("Returning P: %p Next %p Prev %p\n", p, p->next, p->prev);
+		return p+1;
     } else {
-        // Separate current chunk into two chunks.
-        succ = (MemEntry) ((string)p + MEM_SIZE + size);
+        //printf("Splitting node %p %p (addr: %p) \n", p, p->prev, &p->prev);
+		// Separate current chunk into two chunks.
+        succ = (MemEntry) ((string)p + sizeof(struct MemEntry) + size);
         succ->pattern = BLOCK_SIZE + 69;
         succ->prev = p;
         succ->next = p->next;
         if (p->next)
             p->next->prev = succ;
         p->next = succ;
-        succ->size = p->size - MEM_SIZE - size;
+        succ->size = p->size - sizeof(struct MemEntry) - size;
         succ->is_free = 1;
         p->size = size;
         p->is_free = 0;
         p->file = file;
         p->line_num = line;
-        return p+1;
+
+		if(succ->prev != p || p->next->prev != p || succ->prev == succ)
+			abort();
+       	//printf("Succ: %p Next %p (%p) Prev %p (%p) d\n", succ, succ->next, &(succ->next), succ->prev, &(succ->prev), succ->is_free); 
+		//printf("Returning P: %p Next %p Prev %p %d\n", p, p->next, p->prev, p->is_free);
+		//printf("Corresponding Mementry Here: %p\n", p);
+		
+		return ((void*) p) + sizeof(struct MemEntry);
     }
 
     printf(RED "Error: No room in any block to allocate this chunk!\n");
@@ -90,16 +103,31 @@ void* my_malloc(size_t size, string file, size_t line) {
 
 void* my_calloc(size_t size, string file, size_t line) {
     void* ptr = my_malloc(size, file, line);
+    
     if (!ptr) {
         return 0;
     }
+
     memset(ptr, 0, size);
+    
     return ptr;
+}
+
+void* my_realloc(void* ptr, size_t size, string file, size_t line){
+    void* new = my_malloc(size, file, line);
+    
+    if(ptr){
+        MemEntry assoc = ptr - sizeof(struct MemEntry);
+        memcpy(new, ptr, assoc->size >= size ? size : assoc->size);
+
+        my_free(ptr, file, line);
+    }
+
+    return new;
 }
 
 
 void my_free(void* p, string file, size_t line) {
-
     if (!p) {
         printf(RED "Error: Cannot free null pointer!\n");
         printf("\tError made on line %zd in %s\n" RESET, line, file);
@@ -115,7 +143,17 @@ void my_free(void* p, string file, size_t line) {
     }
 
     // Get MemEntry struct of pointer to be freed
-    ptr = (MemEntry) ((string)p - MEM_SIZE);
+    ptr = p - sizeof(struct MemEntry);
+
+/*	
+	printf("Pointer %p Next %p Prev %p\n", ptr, ptr->next, ptr->prev);
+	
+	if(ptr->next)
+		printf("\tNext: %d\n", ptr->next->is_free);
+
+	if(ptr->prev)
+		printf("\tPrev: %d\n", ptr->prev->is_free);
+*/	
 
     if (ptr->pattern != BLOCK_SIZE + 69) {
         printf(RED "Error: Invalid free! Corrupt data.\n");
@@ -127,28 +165,39 @@ void my_free(void* p, string file, size_t line) {
         return;
     }
 
-    if ((pred = ptr->prev) && pred->is_free) {
-        pred->size += MEM_SIZE + ptr->size;
-        pred->next = ptr->next;
-        if (ptr->next)
-            ptr->next->prev = pred;
-    } else {
-        ptr->is_free = 1;
-        pred = ptr;
-    }
+	ptr->is_free = 1;
 
-    if ((succ = ptr->next) && succ->is_free) {
-        pred->size += MEM_SIZE + succ->size;
-        pred->next = succ->next;
-        if (succ->next)
-            succ->next->prev = pred;
-    }
+	MemEntry next = ptr->next;
+	MemEntry prev = ptr->prev;
 
+	if(ptr->prev){
+		if(ptr->prev->is_free){
+//			printf("Merging with previous node %p.\n", prev);
+			prev->size += sizeof(struct MemEntry) + ptr->size;
+			prev->next = next;
+			ptr = prev;
+		
+			if(next)
+				ptr->next->prev = prev;
+		}
+	}
+
+	if(next){
+//		printf(next->is_free ? "wtf\n" : "oh boy it works!\n");
+
+		if(next->is_free){
+			//printf("Merging with next node %p.\n", next);
+			ptr->size +=  sizeof(struct MemEntry) + next->size;
+			ptr->next = next->next;
+		
+			if(ptr->next)
+				ptr->next->prev = ptr;
+		}
+	}
 }
 
 
 void leak_check() {
-
     MemEntry root = (MemEntry) block, p = root;
     int num_leaks = 0;
 
@@ -167,7 +216,6 @@ void leak_check() {
             num_leaks++;
          }
          p = p->next;
-
     }
 
     if (num_leaks == 0) {

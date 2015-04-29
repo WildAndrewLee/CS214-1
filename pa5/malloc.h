@@ -7,6 +7,7 @@ typedef struct MemEntry* MemEntry;
 
 #define malloc(x)       my_malloc( x, __FILE__, __LINE__)
 #define calloc(x,y)       my_calloc( x*y, __FILE__, __LINE__)
+#define realloc(x, y) my_realloc(x, y, __FILE__, __LINE__);
 #define free(x)         my_free( x, __FILE__, __LINE__)
 
 #define RED             "\x1b[31m"
@@ -24,6 +25,7 @@ struct MemEntry {
 
 void* my_malloc(size_t size, string file, size_t line);
 void* my_calloc(size_t size, string file, size_t line);
+void* my_realloc(void* ptr, size_t size, string file, size_t line);
 void my_free(void* ptr, string file, size_t line);
 void leak_check();
 int is_corrupt();

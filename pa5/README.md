@@ -57,4 +57,6 @@ EXTRA CREDIT
        valid for a predetermined value, which we chose to be BLOCK_SIZE + 69.
        If it is not valid, we assume that the memory chunk has been written over
        with some other value and that our memory space has become corrupt.
-
+	5. Realloc(5 Points): We implemented realloc() by calling my_malloc and then
+	   using memcpy to copy the old pointer data to the new pointer. We then use my_free
+	   to free the old pointer.
